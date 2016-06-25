@@ -1,0 +1,11 @@
+doctype html
+html(lang="en")
+  head
+    title Example
+  body
+    table
+      tbody
+      each marker in locations
+        tr
+          img(src="https://maps.googleapis.com/maps/api/staticmap?center=+38.91607726,-77.20676137&zoom=13&size=400x300&markers=#{marker.location}&sensor=false")
+        tr #{marker.time}

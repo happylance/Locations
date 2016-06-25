@@ -1,0 +1,13 @@
+doctype html
+html
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    table
+      tbody
+      each marker in locations
+        tr
+          td
+            body #{marker.time} #{marker.location}
+    p #{update_time}
