@@ -51,6 +51,7 @@ router.get('/1', function(req, res, next) {
   //res.render('index', { title: 'Express' });
   var locations = [];
   var filename = 'public/locations.log';
+  var today = new Date().getDate()
   readline.createInterface({
     input: fs.createReadStream(filename),
     terminal: false
@@ -60,7 +61,10 @@ router.get('/1', function(req, res, next) {
 
     var time = line.substring(0, line.lastIndexOf(":"));
     console.log('time: ' + time);
-    locations.push({time:time, location:location})
+    var datetime = new Date(time)
+    if (datetime.getDate() == today) {
+      locations.push({time:time, location:location})
+    }
   }).on('close', function(){
       res.render('index', {locations:locations});
     });
@@ -69,6 +73,7 @@ router.get('/1', function(req, res, next) {
 router.get('/', function(req, res, next) {
   var locations = [];
   var filename = 'public/locations.log';
+  var today = new Date().getDate()
   readline.createInterface({
     input: fs.createReadStream(filename),
     terminal: false
@@ -77,8 +82,11 @@ router.get('/', function(req, res, next) {
     var location_cn = locationInChinese(distanceInMeters)
 
     var time = line.substring(0, line.lastIndexOf(":"));
-    var datetime_cn = datetimeInChinese(new Date(time))
-    locations.push({time:datetime_cn, location:location_cn})
+    var datetime = new Date(time)
+    if (datetime.getDate() == today) {
+      var datetime_cn = datetimeInChinese(datetime)
+      locations.push({time:datetime_cn, location:location_cn})
+    }
   }).on('close', function(){
       var now_cn = datetimeInChinese(new Date())
       var update_time = "更新于北京时间" + now_cn
