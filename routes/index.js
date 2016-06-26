@@ -21,7 +21,7 @@ function datetimeInChinese(datetime) {
   if (hour < 6) time_prefix_cn = "凌晨"
   if (hour > 17) time_prefix_cn = "晚上"
   hour = hour > 12 ? hour - 12 : hour
-  var time_cn = time_prefix_cn + String(hour) + "点" + pad(datetime.getMinutes(), 2) + "分"
+  var time_cn = time_prefix_cn + String(hour) + ":" + pad(datetime.getMinutes(), 2)
   var datetime_cn = date_cn + time_cn
   console.log('time: ' + datetime_cn);
   return datetime_cn
