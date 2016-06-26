@@ -13,9 +13,30 @@ function pad(num, size) {
     return s;
 }
 
+function dayInChinese(day) {
+  switch(day){
+    case 0:
+        return "日";
+    case 1:
+        return "一";
+    case 2:
+        return "二";
+    case 3:
+        return "三";
+    case 4:
+        return "四";
+    case 5:
+        return "五";
+    case 6:
+        return "六";
+    default:
+        return "";
+  }
+}
+
 function datetimeInChinese(datetime) {
   datetime = new Date(datetime.getTime() + (datetime.getTimezoneOffset() + 8 * 60) * 60 * 1000)
-  var date_cn = String(datetime.getMonth() + 1) + "月" + String(datetime.getDate()) + "日"
+  var date_cn = "周" + dayInChinese(datetime.getDay())
   var hour = datetime.getHours()
   var time_prefix_cn = hour < 12 ? "上午" : "下午"
   if (hour < 6) time_prefix_cn = "凌晨"
