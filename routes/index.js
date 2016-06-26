@@ -27,7 +27,7 @@ function datetimeInChinese(datetime) {
   return datetime_cn
 }
 
-function locationInChinese(distanceInMeters) {
+function distanceInChinese(distanceInMeters) {
   console.log('location: ' + distanceInMeters);
   if (distanceInMeters < 30)
     return "在家"
@@ -46,31 +46,8 @@ function locationInChinese(distanceInMeters) {
   return location_cn
 }
 
-/* GET home page. */
-router.get('/1', function(req, res, next) {
-  //res.render('index', { title: 'Express' });
-  var locations = [];
-  var filename = 'public/locations.log';
-  var today = new Date().getDate()
-  readline.createInterface({
-    input: fs.createReadStream(filename),
-    terminal: false
-  }).on('line', function(line) {
-    var location = line.substring(line.lastIndexOf(":") + 2, line.lastIndexOf(" "));
-    console.log('location: ' + location);
-
-    var time = line.substring(0, line.lastIndexOf(":"));
-    console.log('time: ' + time);
-    var datetime = new Date(time)
-    if (datetime.getDate() == today) {
-      locations.push({time:time, location:location})
-    }
-  }).on('close', function(){
-      res.render('index', {locations:locations});
-    });
-});
-
 router.get('/', function(req, res, next) {
+  var distances = [];
   var locations = [];
   var filename = 'public/locations.log';
   var today = new Date().getDate()
@@ -79,13 +56,15 @@ router.get('/', function(req, res, next) {
     terminal: false
   }).on('line', function(line) {
     var distanceInMeters = line.substring(line.lastIndexOf(" ") + 1);
-    var location_cn = locationInChinese(distanceInMeters)
+    var distance_cn = distanceInChinese(distanceInMeters)
+
+    var location = line.substring(line.lastIndexOf(":") + 2, line.lastIndexOf(" "));
 
     var time = line.substring(0, line.lastIndexOf(":"));
     var datetime = new Date(time)
     if (datetime.getDate() == today) {
       var datetime_cn = datetimeInChinese(datetime)
-      locations.push({time:datetime_cn, location:location_cn})
+      locations.push({time:datetime_cn, distance:distance_cn, location:location})
     }
   }).on('close', function(){
       var now_cn = datetimeInChinese(new Date())
