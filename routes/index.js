@@ -49,14 +49,13 @@ router.get('/1', function(req, res, next) {
 
     var time = line.substring(0, line.lastIndexOf(":"));
     console.log('time: ' + time);
-    locations.splice(0, 0, {time:time, location:location})
+    locations.push({time:time, location:location})
   }).on('close', function(){
       res.render('index', {locations:locations});
     });
 });
 
 router.get('/', function(req, res, next) {
-  //res.render('index', { title: 'Express' });
   var locations = [];
   var filename = 'public/locations.log';
   readline.createInterface({
@@ -68,7 +67,7 @@ router.get('/', function(req, res, next) {
 
     var time = line.substring(0, line.lastIndexOf(":"));
     var datetime_cn = datetimeInChinese(new Date(time))
-    locations.splice(0, 0, {time:datetime_cn, location:location_cn})
+    locations.push({time:datetime_cn, location:location_cn})
   }).on('close', function(){
       var now_cn = datetimeInChinese(new Date())
       var update_time = "更新于北京时间" + now_cn
