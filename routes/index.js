@@ -29,9 +29,20 @@ function datetimeInChinese(datetime) {
 
 function locationInChinese(distanceInMeters) {
   console.log('location: ' + distanceInMeters);
+  if (distanceInMeters < 30)
+    return "在家"
 
-  var location_cn = "离家" + distanceInMeters + "米"
-  if (distanceInMeters < 30) location_cn = "在家"
+  var distance_cn = distanceInMeters + "米"
+  if (distanceInMeters >= 500) {
+    var distanceInQuarterKM = Math.round(distanceInMeters / 250)
+    var distanceInLi = Math.floor(distanceInQuarterKM / 2)
+    distance_cn = distanceInLi + "里"
+    if(distanceInQuarterKM % 2 == 1) {
+      distance_cn += "半"
+    }
+  }
+
+  var location_cn = "离家" + distance_cn
   return location_cn
 }
 
