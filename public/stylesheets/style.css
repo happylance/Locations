@@ -1,5 +1,5 @@
 body {
-  padding: 20px;
+  padding: 10px;
   font: 45px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -10,3 +10,14 @@ p {
 a {
   color: #00B7FF;
 }
+
+#nav ul{text-align:left;
+list-style-type:none;padding:0px 10px;}
+#nav ul li{display:inline;}
+#nav ul li a{font-weight:bold;border:1px solid #ccc;
+text-decoration:none;padding:10px 20px;
+border-bottom:none;margin-right:5px;
+margin-bottom:1px;background-color:#eee}
+#nav ul li a.current{background-color:#fff;
+border-bottom:1px solid #fff;}
+#nav ul li a:hover{color:#000;background-color:#eee;}

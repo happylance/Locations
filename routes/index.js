@@ -42,6 +42,7 @@ function datetimeInChinese(datetime) {
   if (hour < 6) time_prefix_cn = "凌晨"
   if (hour > 17) time_prefix_cn = "晚上"
   hour = hour > 12 ? hour - 12 : hour
+  hour = hour == 0 ? hour = 12 : hour
   var time_cn = time_prefix_cn + String(hour) + ":" + pad(datetime.getMinutes(), 2)
   var datetime_cn = date_cn + time_cn
   console.log('time: ' + datetime_cn);
@@ -67,11 +68,12 @@ function distanceInChinese(distanceInMeters) {
   return location_cn
 }
 
-router.get('/', function(req, res, next) {
+function router_get(req, res, tab_id) {
   var distances = [];
   var locations = [];
-  var filename = 'public/locations.log';
-  var today = new Date().getDate()
+  var filename = 'data/locations.log';
+  var today = new Date()
+  var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
   readline.createInterface({
     input: fs.createReadStream(filename),
     terminal: false
@@ -83,15 +85,34 @@ router.get('/', function(req, res, next) {
 
     var time = line.substring(0, line.lastIndexOf(":"));
     var datetime = new Date(time)
-    if (datetime.getDate() == today) {
+    if (datetime.getDate() == tab_date.getDate()) {
       var datetime_cn = datetimeInChinese(datetime)
       locations.push({time:datetime_cn, distance:distance_cn, location:location})
     }
   }).on('close', function(){
       var now_cn = datetimeInChinese(new Date())
       var update_time = "更新于北京时间" + now_cn
-      res.render('layout', {locations:locations, update_time:update_time});
+      var today_day = today.getDay()
+      var tab_count = 3
+      var titles = []
+      for (var i = 0; i < tab_count; i++) {
+          var day = today_day - i
+          if (day < 0) day += 7
+          var day_cn = "周" + dayInChinese(day)
+          titles.push(day_cn)
+      }
+      res.render('index', {locations:locations, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
     });
+}
+
+router.get('/', function(req, res, next) {
+  router_get(req, res, 0)
+});
+
+// https://tanyanam.com/2012/06/27/tabbed-navigation-with-jade-and-node-js/
+router.get('/:tab_id', function(req, res, next) {
+  var tab_id = req.params.tab_id;
+  router_get(req, res, tab_id)
 });
 
 module.exports = router;
