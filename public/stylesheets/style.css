@@ -1,14 +1,16 @@
 body {
-  padding: 10px;
+  padding-left: 10px;
   font: 44px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 p {
-  font: 40px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 36px "Lucida Grande", Helvetica, Arial, sans-serif;
+  line-height: 5px;
 }
 
 a {
   color: #00B7FF;
+  line-height: 10px;
 }
 
 #nav ul{text-align:left;
