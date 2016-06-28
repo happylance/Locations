@@ -3,6 +3,10 @@ body {
   font: 44px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+ul {
+  line-height: 5px;
+}
+
 p {
   font: 36px "Lucida Grande", Helvetica, Arial, sans-serif;
   line-height: 5px;
