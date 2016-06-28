@@ -1,19 +1,7 @@
 doctype html
 html
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  head
+    title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    table
-      tbody
-      each marker in locations
-        tr
-          td
-            body #{marker.time}#{marker.distance}
-    p #{update_time}
-
-    table
-      tbody
-      each marker in locations
-        tr
-          img(src="http://maps.google.cn/maps/api/staticmap?center=+38.91607726,-77.20676137&zoom=13&size=400x300&markers=#{marker.location}&sensor=false")
+    block content

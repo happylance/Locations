@@ -31,21 +31,13 @@ html
   body
     div#nav
       ul
-        li
-          if(currentURL == '/0')
-            a(href='/0').current #{titles[0]}
+        each title,index in titles
+          if(currentURL == '/' + index)
+            li
+              a(href='/' + index).current #{title}
           else
-            a(href='/0') #{titles[0]}
-        li
-          if(currentURL == '/1')
-             a(href='/1').current #{titles[1]}
-          else
-             a(href='/1') #{titles[1]}
-        li
-          if(currentURL == '/2')
-             a(href='/2').current #{titles[2]}
-          else
-             a(href='/2') #{titles[2]}
+            li
+              a(href='/' + index) #{title}
     table
       tbody
         each marker in locations

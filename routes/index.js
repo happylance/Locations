@@ -3,10 +3,6 @@ var router = express.Router();
 var fs = require('fs')
 var readline = require('readline');
 
-function handleClick(e) {
-  console.log('Clicked at position', e.latLng);
-}
-
 function pad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
@@ -93,7 +89,7 @@ function router_get(req, res, tab_id) {
       var now_cn = datetimeInChinese(new Date())
       var update_time = "更新于北京时间" + now_cn
       var today_day = today.getDay()
-      var tab_count = 3
+      var tab_count = 7
       var titles = []
       for (var i = 0; i < tab_count; i++) {
           var day = today_day - i
