@@ -35,7 +35,8 @@ function datetimeInChinese(datetime) {
   var date_cn = "周" + dayInChinese(datetime.getDay())
   var hour = datetime.getHours()
   var time_prefix_cn = hour < 12 ? "上午" : "下午"
-  if (hour < 6) time_prefix_cn = "凌晨"
+  if (hour < 8) time_prefix_cn = "早上"
+  if (hour < 4) time_prefix_cn = "凌晨"
   if (hour > 17) time_prefix_cn = "晚上"
   hour = hour > 12 ? hour - 12 : hour
   hour = hour == 0 ? hour = 12 : hour
