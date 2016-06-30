@@ -45,6 +45,13 @@ function datetimeInChinese(datetime) {
   return datetime_cn
 }
 
+function datetimeInEnglish(datetime) {
+  var date_en = datetime.toDateString()
+  var time_en = datetime.toLocaleTimeString()
+  var datetime_en = date_en + ' ' + time_en
+  return datetime_en
+}
+
 function distanceInChinese(distanceInMeters) {
   if (distanceInMeters < 30)
     return "在家"
@@ -70,12 +77,12 @@ getClientAddress = function (req) {
 };
 
 function router_get(req, res, tab_id) {
-  console.log(getClientAddress(req) + ' ' + req.headers['user-agent'])
   var distances = [];
   var locations = [];
   var filename = 'data/locations.log';
   var today = new Date()
   var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
+  console.log(datetimeInEnglish(today) + ' ' + getClientAddress(req) + ' ' + req.headers['user-agent'])
   readline.createInterface({
     input: fs.createReadStream(filename),
     terminal: false
