@@ -92,7 +92,7 @@ function router_get(req, res, tab_id) {
   var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
     getClientAddress(req) + ' ' + req.headers['user-agent']
   console.log(req_log)
-  fs.appendFile('./map.log', req_log, function (err) {
+  fs.appendFile('./map.log', req_log + '\n', function (err) {
     console.log(err)
   });
 
