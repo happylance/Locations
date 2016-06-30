@@ -3,6 +3,13 @@ var router = express.Router();
 var fs = require('fs')
 var readline = require('readline');
 
+const Console = require('console').Console;
+const output = fs.createWriteStream('./map.log', {'flags': 'a'});
+const errorOutput = fs.createWriteStream('./err.log', {'flags': 'a'});
+// custom simple logger
+const logger = new Console(output, errorOutput);
+
+
 function pad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
@@ -73,7 +80,7 @@ function distanceInChinese(distanceInMeters) {
 // Get client IP address from request object ----------------------
 getClientAddress = function (req) {
         return (req.headers['x-forwarded-for'] || '').split(',')[0]
-        || req.connection.remoteAddress;
+          || req.connection.remoteAddress;
 };
 
 function router_get(req, res, tab_id) {
@@ -82,7 +89,10 @@ function router_get(req, res, tab_id) {
   var filename = 'data/locations.log';
   var today = new Date()
   var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
-  console.log(datetimeInEnglish(today) + ' ' + getClientAddress(req) + ' ' + req.headers['user-agent'])
+  var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
+    getClientAddress(req) + ' ' + req.headers['user-agent']
+  console.log(req_log)
+  logger.log(req_log)
   readline.createInterface({
     input: fs.createReadStream(filename),
     terminal: false
