@@ -42,12 +42,10 @@ function datetimeInChinese(datetime) {
   hour = hour == 0 ? hour = 12 : hour
   var time_cn = time_prefix_cn + String(hour) + ":" + pad(datetime.getMinutes(), 2)
   var datetime_cn = date_cn + time_cn
-  console.log('time: ' + datetime_cn);
   return datetime_cn
 }
 
 function distanceInChinese(distanceInMeters) {
-  console.log('location: ' + distanceInMeters);
   if (distanceInMeters < 30)
     return "在家"
 
@@ -65,7 +63,14 @@ function distanceInChinese(distanceInMeters) {
   return location_cn
 }
 
+// Get client IP address from request object ----------------------
+getClientAddress = function (req) {
+        return (req.headers['x-forwarded-for'] || '').split(',')[0]
+        || req.connection.remoteAddress;
+};
+
 function router_get(req, res, tab_id) {
+  console.log(getClientAddress(req) + ' ' + req.headers['user-agent'])
   var distances = [];
   var locations = [];
   var filename = 'data/locations.log';
@@ -75,15 +80,16 @@ function router_get(req, res, tab_id) {
     input: fs.createReadStream(filename),
     terminal: false
   }).on('line', function(line) {
-    var distanceInMeters = line.substring(line.lastIndexOf(" ") + 1);
-    var distance_cn = distanceInChinese(distanceInMeters)
-
-    var location = line.substring(line.lastIndexOf(":") + 2, line.lastIndexOf(" "));
-
     var time = line.substring(0, line.lastIndexOf(":"));
     var datetime = new Date(time)
     if (datetime.getDate() == tab_date.getDate()) {
+      var distanceInMeters = line.substring(line.lastIndexOf(" ") + 1);
+      var distance_cn = distanceInChinese(distanceInMeters)
+
+      var location = line.substring(line.lastIndexOf(":") + 2, line.lastIndexOf(" "));
+
       var datetime_cn = datetimeInChinese(datetime)
+      console.log(datetime_cn + distance_cn)
       locations.push({time:datetime_cn, distance:distance_cn, location:location})
     }
   }).on('close', function(){
@@ -98,6 +104,7 @@ function router_get(req, res, tab_id) {
           var day_cn = "周" + dayInChinese(day)
           titles.push(day_cn)
       }
+      console.log(update_time)
       res.render('index', {locations:locations, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
     });
 }
