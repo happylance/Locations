@@ -92,8 +92,36 @@ function router_get(req, res, tab_id) {
   var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
     getClientAddress(req) + ' ' + req.headers['user-agent']
   console.log(req_log)
-  fs.appendFile('./map.log', req_log + '\n', function (err) {
+  var mapLogFile = './map.log'
+  fs.appendFile(mapLogFile, '\n' + req_log, function (err) {
     console.log(err)
+  });
+
+  function isLessThan3DaysOld(log) {
+    var time = log.split(' ').slice(0,5)
+    var datetime = new Date(time)
+    return datetime.getTime() > (today - 3 * 86400 * 1000)
+  }
+
+  fs.readFile(mapLogFile, function(err, data) { // read file to memory
+    if (!err) {
+        data = data.toString(); // stringify buffer
+        var mapLogs = data.split('\n')
+        var recentMapLogs = mapLogs.filter(isLessThan3DaysOld)
+        if (mapLogs.length == recentMapLogs.length) {
+          return
+        }
+
+        var newLog = recentMapLogs.join('\n')
+
+        fs.writeFile(mapLogFile, newLog, function(err) { // write file
+            if (err) { // if error, report
+                console.log (err);
+            }
+        });
+    } else {
+        console.log(err);
+    }
   });
 
   readline.createInterface({
