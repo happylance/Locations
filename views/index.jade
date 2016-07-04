@@ -46,6 +46,12 @@ html
               body #{marker.time}
             td
               body #{marker.distance}
+        each action in actions
+          tr
+            td
+              body #{action.time}
+            td
+              body #{action.action}
 
     p #{update_time}
 

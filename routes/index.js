@@ -77,55 +77,23 @@ function distanceInChinese(distanceInMeters) {
   return location_cn
 }
 
+function actionInChinese(action) {
+  if (action == "startedMeditation") {
+    return "开始打坐"
+  }
+  return ""
+}
 // Get client IP address from request object ----------------------
 getClientAddress = function (req) {
         return (req.headers['x-forwarded-for'] || '').split(',')[0]
           || req.connection.remoteAddress;
 };
 
-function router_get(req, res, tab_id) {
+function getLocations(logFile, tab_date, onClose) {
   var distances = [];
   var locations = [];
-  var filename = 'data/locations.log';
-  var today = new Date()
-  var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
-  var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
-    getClientAddress(req) + ' ' + req.headers['user-agent']
-  console.log(req_log)
-  var mapLogFile = './map.log'
-  fs.appendFile(mapLogFile, '\n' + req_log, function (err) {
-    console.log(err)
-  });
-
-  function isLessThan3DaysOld(log) {
-    var time = log.split(' ').slice(0,5)
-    var datetime = new Date(time)
-    return datetime.getTime() > (today - 3 * 86400 * 1000)
-  }
-
-  fs.readFile(mapLogFile, function(err, data) { // read file to memory
-    if (!err) {
-        data = data.toString(); // stringify buffer
-        var mapLogs = data.split('\n')
-        var recentMapLogs = mapLogs.filter(isLessThan3DaysOld)
-        if (mapLogs.length == recentMapLogs.length) {
-          return
-        }
-
-        var newLog = recentMapLogs.join('\n')
-
-        fs.writeFile(mapLogFile, newLog, function(err) { // write file
-            if (err) { // if error, report
-                console.log (err);
-            }
-        });
-    } else {
-        console.log(err);
-    }
-  });
-
   readline.createInterface({
-    input: fs.createReadStream(filename),
+    input: fs.createReadStream(logFile),
     terminal: false
   }).on('line', function(line) {
     var time = line.substring(0, line.lastIndexOf(":"));
@@ -141,6 +109,78 @@ function router_get(req, res, tab_id) {
       locations.push({time:datetime_cn, distance:distance_cn, location:location})
     }
   }).on('close', function(){
+    onClose(locations)
+  });
+};
+
+function getActions(logFile, tab_date, onClose) {
+  var actions = [];
+  readline.createInterface({
+    input: fs.createReadStream(logFile),
+    terminal: false
+  }).on('line', function(line) {
+    var time = line.substring(0, line.lastIndexOf(" "));
+    var datetime = new Date(time)
+    if (datetime.getDate() == tab_date.getDate()) {
+      var action = line.substring(line.lastIndexOf(" ") + 1);
+      var action_cn = actionInChinese(action)
+      var datetime_cn = datetimeInChinese(datetime)
+      console.log(datetime_cn + action_cn)
+      actions.push({time:datetime_cn, action:action_cn})
+    }
+  }).on('close', function(){
+    console.log(actions)
+    onClose(actions)
+  });
+};
+
+function addLogToFile(req_log, accessLogFile) {
+  fs.appendFile(accessLogFile, '\n' + req_log, function (err) {
+    if (err) {
+      console.log(err)
+    }
+  });
+
+  var today = new Date()
+  function isLessThan3DaysOld(log) {
+    var time = log.split(' ').slice(0,5)
+    var datetime = new Date(time)
+    return datetime.getTime() > (today - 3 * 86400 * 1000)
+  }
+
+  fs.readFile(accessLogFile, function(err, data) { // read file to memory
+    if (!err) {
+        data = data.toString(); // stringify buffer
+        var mapLogs = data.split('\n')
+        var recentMapLogs = mapLogs.filter(isLessThan3DaysOld)
+        if (mapLogs.length == recentMapLogs.length) {
+          return
+        }
+
+        var newLog = recentMapLogs.join('\n')
+        fs.writeFile(accessLogFile, newLog, function(err) { // write file
+            if (err) { // if error, report
+                console.log (err);
+            }
+        });
+    } else {
+        console.log(err);
+    }
+  });
+}
+function router_get(req, res, tab_id) {
+  var locationLogFile = 'data/locations.log';
+  var actionLogFile = 'data/actions.log';
+  var accessLogFile = './map.log'
+  var today = new Date()
+  var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
+  var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
+    getClientAddress(req) + ' ' + req.headers['user-agent']
+  console.log(req_log)
+  addLogToFile(req_log, accessLogFile)
+
+  getLocations(locationLogFile, tab_date, function(locations) {
+    getActions(actionLogFile, tab_date, function(actions) {
       var now_cn = datetimeInChinese(new Date())
       var update_time = "更新于北京时间" + now_cn
       var today_day = today.getDay()
@@ -153,8 +193,9 @@ function router_get(req, res, tab_id) {
           titles.push(day_cn)
       }
       console.log(update_time)
-      res.render('index', {locations:locations, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
+      res.render('index', {locations:locations, actions:actions, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
     });
+  });
 }
 
 router.get('/', function(req, res, next) {
