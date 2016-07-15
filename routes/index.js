@@ -85,8 +85,10 @@ function actionInChinese(action) {
 }
 // Get client IP address from request object ----------------------
 getClientAddress = function (req) {
-        return (req.headers['x-forwarded-for'] || '').split(',')[0]
-          || req.connection.remoteAddress;
+  var addr =  (req.headers['x-forwarded-for'] || '').split(',')[0] || req.connection.remoteAddress;
+  addr = addr.replace(/::ffff:/, '')
+  console.log(addr)
+  return addr
 };
 
 function getLocations(logFile, tab_date, onClose) {
@@ -174,8 +176,13 @@ function router_get(req, res, tab_id) {
   var accessLogFile = './map.log'
   var today = new Date()
   var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
+
+  var user_agent = req.headers['user-agent']
+  user_agent = user_agent.replace(/Mozilla\/5\.0 \(/, "")
+  user_agent = user_agent.replace(/like Mac OS X\) AppleWebKit\/601\.1\.46 \(KHTML, like Gecko\) Mobile\/13F69/, "")
+  user_agent = user_agent.replace(/; CPU.*OS/, "")
   var req_log = datetimeInEnglish(today) + ' ' + String(tab_id) + ' ' +
-    getClientAddress(req) + ' ' + req.headers['user-agent']
+    getClientAddress(req) + ' ' + user_agent
   console.log(req_log)
   addLogToFile(req_log, accessLogFile)
 
