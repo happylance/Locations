@@ -5,9 +5,8 @@ var readline = require('readline');
 
 const Console = require('console').Console;
 const output = fs.createWriteStream('./map.log', {'flags': 'a'});
-const errorOutput = fs.createWriteStream('./err.log', {'flags': 'a'});
 // custom simple logger
-const logger = new Console(output, errorOutput);
+const logger = new Console(output, output);
 
 
 function pad(num, size) {
@@ -78,10 +77,14 @@ function distanceInChinese(distanceInMeters) {
 }
 
 function actionInChinese(action) {
-  if (action == "startedMeditation") {
-    return "开始打坐"
+  switch (action) {
+    case "startMeditation":
+      return "开始打坐"
+    case "stopMeditation":
+      return "打坐完毕"
+    default:
+      return "";
   }
-  return ""
 }
 // Get client IP address from request object ----------------------
 getClientAddress = function (req) {
@@ -108,7 +111,7 @@ function getLocations(logFile, tab_date, onClose) {
 
       var datetime_cn = datetimeInChinese(datetime)
       console.log(datetime_cn + distance_cn)
-      locations.push({time:datetime_cn, distance:distance_cn, location:location})
+      locations.push({time:datetime_cn, distance:distance_cn, location:location, timestamp:datetime.getTime()})
     }
   }).on('close', function(){
     onClose(locations)
@@ -128,7 +131,7 @@ function getActions(logFile, tab_date, onClose) {
       var action_cn = actionInChinese(action)
       var datetime_cn = datetimeInChinese(datetime)
       console.log(datetime_cn + action_cn)
-      actions.push({time:datetime_cn, action:action_cn})
+      actions.push({time:datetime_cn, action:action_cn,timestamp:datetime.getTime()})
     }
   }).on('close', function(){
     console.log(actions)
@@ -200,9 +203,27 @@ function router_get(req, res, tab_id) {
           titles.push(day_cn)
       }
       console.log(update_time)
+      actions = mergeActions(actionsFromLocations(locations), actions)
       res.render('index', {locations:locations, actions:actions, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
     });
   });
+}
+
+function actionsFromLocations(locations) {
+  return locations.map(function(location) {
+    return {time:location.time, action:location.distance,timestamp:location.timestamp};
+  })
+}
+
+function mergeActions(a, b) {
+  var c = [];
+  while(a.length && b.length){
+    if(b[0].timestamp <= a[0].timestamp) c.push(b.shift());
+    else c.push(a.shift());
+  }
+  if(a.length) c = c.concat(a);
+  if(b.length) c = c.concat(b);
+  return c;
 }
 
 router.get('/', function(req, res, next) {
