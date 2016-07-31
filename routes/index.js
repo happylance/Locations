@@ -120,6 +120,7 @@ function getLocations(logFile, tab_date, onClose) {
 
 function getActions(logFile, tab_date, onClose) {
   var actions = [];
+  var startMeditationTime = 0
   readline.createInterface({
     input: fs.createReadStream(logFile),
     terminal: false
@@ -130,6 +131,13 @@ function getActions(logFile, tab_date, onClose) {
       var action = line.substring(line.lastIndexOf(" ") + 1);
       var action_cn = actionInChinese(action)
       var datetime_cn = datetimeInChinese(datetime)
+
+      if (action == "startMeditation") startMeditationTime = datetime.getTime()
+      if (action == "stopMeditation") {
+        var durationInMinutes = Math.floor((datetime.getTime() - startMeditationTime) / (60 * 1000))
+        action_cn = action_cn + "，历时" + durationInMinutes + "分"
+      }
+
       console.log(datetime_cn + action_cn)
       actions.push({time:datetime_cn, action:action_cn,timestamp:datetime.getTime()})
     }
