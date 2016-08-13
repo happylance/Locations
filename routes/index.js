@@ -127,12 +127,11 @@ function getActions(logFile, tab_date, onClose) {
   }).on('line', function(line) {
     var time = line.substring(0, line.lastIndexOf(" "));
     var datetime = new Date(time)
+    var action = line.substring(line.lastIndexOf(" ") + 1);
+    if (action == "startMeditation") startMeditationTime = datetime.getTime()
     if (datetime.getDate() == tab_date.getDate()) {
-      var action = line.substring(line.lastIndexOf(" ") + 1);
       var action_cn = actionInChinese(action)
       var datetime_cn = datetimeInChinese(datetime)
-
-      if (action == "startMeditation") startMeditationTime = datetime.getTime()
       if (action == "stopMeditation") {
         var durationInMinutes = Math.floor((datetime.getTime() - startMeditationTime) / (60 * 1000))
         action_cn = action_cn + "，历时" + durationInMinutes + "分"
