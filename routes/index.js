@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs')
 var readline = require('readline');
+var moment = require('moment')
 
 const Console = require('console').Console;
 const output = fs.createWriteStream('./map.log', {'flags': 'a'});
@@ -233,7 +234,29 @@ function mergeActions(a, b) {
   return c;
 }
 
+function AddAction(actionString) {
+  var actionLogFile = 'data/actions.log';
+  var now = moment().format("YYYY-MM-DD hh:mm:ss A")
+  var newAction = now + ' ' + actionString
+  console.log(newAction)
+  fs.appendFile(actionLogFile, '\n' + newAction, function (err) {
+    if (err) {
+      console.log(err)
+    }
+  });
+}
+
+function handleAction(action) {
+  if (action == "startMeditation" || action == "stopMeditation") {
+    AddAction(action)
+  }
+}
+
 router.get('/', function(req, res, next) {
+  if (req.query.action) {
+    handleAction(req.query.action)
+  }
+
   router_get(req, res, 0)
 });
 
