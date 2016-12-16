@@ -246,9 +246,28 @@ function AddAction(actionString) {
   });
 }
 
+function removeLastLine(lines) {
+  if(lines.lastIndexOf("\n")>0) {
+    return lines.substring(0, lines.lastIndexOf("\n"));
+  } else {
+    return "";
+  }
+}
+
+function removeLastAction() {
+  var actionLogFile = 'data/actions.log';
+  var data = fs.readFileSync(actionLogFile, 'utf-8');
+  var newData = removeLastLine(data);
+  fs.writeFileSync(actionLogFile, newData, 'utf-8');
+  console.log('Removed last action');
+}
+
+
 function handleAction(action) {
   if (action == "startMeditation" || action == "stopMeditation") {
     AddAction(action)
+  } else if (action == "cancel") {
+    removeLastAction()
   }
 }
 
