@@ -47,6 +47,9 @@ html
             td
               body #{action.action}
 
+    if(cancel != "")
+      p #[a(href='/?action=' + cancel) 删除最后一行]
+
     p #{update_time}
 
     table

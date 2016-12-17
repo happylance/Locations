@@ -8,7 +8,7 @@ const Console = require('console').Console;
 const output = fs.createWriteStream('./map.log', {'flags': 'a'});
 // custom simple logger
 const logger = new Console(output, output);
-
+const cancelToken = "cancel_023F3CD0-5B6D-47E7-9E6C-3319C1811738";
 
 function pad(num, size) {
     var s = num+"";
@@ -211,8 +211,19 @@ function router_get(req, res, tab_id) {
           titles.push(day_cn)
       }
       console.log(update_time)
-      actions = mergeActions(actionsFromLocations(locations), actions)
-      res.render('index', {locations:locations, actions:actions, update_time:update_time, currentURL:"/" + tab_id, titles:titles});
+      var cancel = "";
+      if (req.query.action && req.query.action == "cancel") {
+        cancel = cancelToken
+      } else if (req.query.action && req.query.action == cancelToken) {
+        redirectUrl = "http://" + req.headers.host + '/'
+        console.log(redirectUrl)
+        res.redirect(redirectUrl)
+        return
+      } else {
+        actions = mergeActions(actionsFromLocations(locations), actions)
+      }
+      res.render('index', {locations:locations, actions:actions, update_time:update_time,
+        currentURL:"/" + tab_id, titles:titles, cancel:cancel});
     });
   });
 }
@@ -266,7 +277,7 @@ function removeLastAction() {
 function handleAction(action) {
   if (action == "startMeditation" || action == "stopMeditation") {
     AddAction(action)
-  } else if (action == "cancel") {
+  } else if (action == cancelToken) {
     removeLastAction()
   }
 }
