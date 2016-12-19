@@ -9,6 +9,8 @@ const output = fs.createWriteStream('./map.log', {'flags': 'a'});
 // custom simple logger
 const logger = new Console(output, output);
 const cancelToken = "cancel_023F3CD0-5B6D-47E7-9E6C-3319C1811738";
+const actionLogFile = 'data/actions.log';
+const locationLogFile = 'data/locations.log';
 
 function pad(num, size) {
     var s = num+"";
@@ -182,8 +184,6 @@ function addLogToFile(req_log, accessLogFile) {
   });
 }
 function router_get(req, res, tab_id) {
-  var locationLogFile = 'data/locations.log';
-  var actionLogFile = 'data/actions.log';
   var accessLogFile = './map.log'
   var today = new Date()
   var tab_date = new Date(today.getTime() - 86400 * 1000 * tab_id)
@@ -288,6 +288,24 @@ router.get('/', function(req, res, next) {
   }
 
   router_get(req, res, 0)
+});
+
+router.get('/meditating', function(req, res, next) {
+  var data = fs.readFileSync(actionLogFile, 'utf-8');
+  var lines = data.trim().split('\n');
+
+  if (lines.length > 0) {
+    var lastLine = lines.slice(-1)[0];
+    console.log(lastLine)
+    if (lastLine.indexOf("startMeditation") > -1) {
+      console.log("Meditating=yes")
+      res.send({meditating:"yes"})
+      return
+    }
+  }
+  console.log("Meditating=no")
+  res.send({meditating:"no"})
+  return
 });
 
 // https://tanyanam.com/2012/06/27/tabbed-navigation-with-jade-and-node-js/
