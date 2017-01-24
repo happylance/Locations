@@ -54,10 +54,12 @@ function actionsFromLocations(locations) {
 
 router.get('/', function(req, res, next) {
   if (req.query.action) {
-    action.handleAction(req.query.action)
+    action.handleAction(req.query.action, function(err = "") {
+      router_get(req, res, 0)
+    })
+  } else {
+    router_get(req, res, 0)
   }
-
-  router_get(req, res, 0)
 });
 
 router.get('/meditating', function(req, res, next) {
