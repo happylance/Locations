@@ -4,6 +4,7 @@ var router = express.Router();
 var dateUtil = require('../lib/dateUtil')
 var dayInChinese = dateUtil.dayInChinese
 var datetimeInChinese = dateUtil.datetimeInChinese
+var moment = require('moment-timezone')
 
 var action = require('../lib/action')
 var getLocations = require('../lib/location').getLocations
@@ -15,9 +16,10 @@ function router_get(req, res, tab_id) {
 
   addAccessLog(req, tab_id)
 
+  var timezone = "Asia/Shanghai"
   getLocations(tab_date, function(locations) {
     action.getActions(tab_date, function(actions) {
-      var now_cn = datetimeInChinese(new Date())
+      var now_cn = datetimeInChinese(moment.utc().valueOf() / 1000, timezone)
       var update_time = "更新于北京时间" + now_cn
       var today_day = today.getDay()
       var tab_count = 7
